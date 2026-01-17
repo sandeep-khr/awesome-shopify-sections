@@ -5,3 +5,4 @@ A collection of modern, reusable Shopify sections and Liquid snippets designed t
 - **A+ Content Section**: Rich content modules for product pages.
 - **Before/After Slider**: Interactive image comparison tool.
 - **Infinite Marquee**: Smooth scrolling announcement bar.
+- **Pro Bundle Builder**: Complex "Build Your Own Bundle" system (Client-side).
