@@ -1,2 +1,5 @@
 # awesome-shopify-sections
-A collection of modern, reusable Shopify sections and Liquid snippets, from product cards to banners, FAQs, accordions, and more.
+A collection of modern, reusable Shopify sections and Liquid snippets designed to enhance your store's visual appeal. This repository includes snippets and sections that act as drop-in upgrades for your theme.
+
+## Features
+- **A+ Content Section**: Rich content modules for product pages.
