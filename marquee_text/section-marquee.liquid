@@ -1,0 +1,159 @@
+{% schema %}
+{
+  "name": "Infinite Marquee",
+  "settings": [
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "label": "Font Size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "speed",
+      "min": 5,
+      "max": 50,
+      "step": 1,
+      "unit": "s",
+      "label": "Animation Speed (Seconds)",
+      "default": 20
+    },
+    {
+      "type": "checkbox",
+      "id": "pause_on_hover",
+      "label": "Pause on Hover",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "direction",
+      "label": "Direction",
+      "options": [
+        { "value": "normal", "label": "Left to Right" },
+        { "value": "reverse", "label": "Right to Left" }
+      ],
+      "default": "normal"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "text",
+      "name": "Announcement",
+      "settings": [
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Text",
+          "default": "FREE SHIPPING ON ALL ORDERS"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        },
+        {
+            "type": "text",
+            "id": "separator",
+            "label": "Separator Icon/Text",
+            "default": "•"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Infinite Marquee",
+      "blocks": [
+        { "type": "text" },
+        { "type": "text" },
+        { "type": "text" }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+{%- style -%}
+  .marquee-section-{{ section.id }} {
+    background-color: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    padding: 15px 0;
+    overflow: hidden;
+    position: relative;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+  }
+
+  .marquee-content {
+    display: flex;
+    align-items: center;
+    animation: marquee-{{ section.id }} {{ section.settings.speed }}s linear infinite;
+    animation-direction: {{ section.settings.direction }};
+  }
+
+  /* Duplicate content for seamless loop */
+  .marquee-section-{{ section.id }}:hover .marquee-content {
+    {% if section.settings.pause_on_hover %}
+    animation-play-state: paused;
+    {% endif %}
+  }
+
+  .marquee-item {
+    font-size: {{ section.settings.font_size }}px;
+    font-weight: 700;
+    padding: 0 40px;
+    text-transform: uppercase;
+    display: inline-flex;
+    align-items: center;
+    gap: 20px;
+  }
+  
+  .marquee-item a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  @keyframes marquee-{{ section.id }} {
+    from { transform: translateX(0); }
+    to { transform: translateX(-100%); }
+  }
+{%- endstyle -%}
+
+<div class="marquee-section-{{ section.id }}">
+  <!-- We need enough duplicates to fill screen + scroll. 
+       Usually 2 sets of items is enough if they are long, but 4 is safer for wide screens with short text. -->
+  {% for k in (1..15) %} <!-- Logic to repeat content purely via Liquid to avoid JS calculation delay -->
+      <div class="marquee-content" aria-hidden="{% if k > 1 %}true{% endif %}">
+        {% for block in section.blocks %}
+          <div class="marquee-item" {{ block.shopify_attributes }}>
+            {% if block.settings.link %}
+              <a href="{{ block.settings.link }}">{{ block.settings.text }}</a>
+            {% else %}
+              <span>{{ block.settings.text }}</span>
+            {% endif %}
+            
+            {% if block.settings.separator != blank %}
+              <span class="marquee-separator">{{ block.settings.separator }}</span>
+            {% endif %}
+          </div>
+        {% endfor %}
+      </div>
+  {% endfor %}
+</div>

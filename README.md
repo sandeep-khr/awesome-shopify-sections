@@ -3,3 +3,5 @@ A collection of modern, reusable Shopify sections and Liquid snippets designed t
 
 ## Features
 - **A+ Content Section**: Rich content modules for product pages.
+- **Before/After Slider**: Interactive image comparison tool.
+- **Infinite Marquee**: Smooth scrolling announcement bar.
