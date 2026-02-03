@@ -6,3 +6,4 @@ A collection of modern, reusable Shopify sections and Liquid snippets designed t
 - **Before/After Slider**: Interactive image comparison tool.
 - **Infinite Marquee**: Smooth scrolling announcement bar.
 - **Pro Bundle Builder**: Complex "Build Your Own Bundle" system (Client-side).
+- **Shoppable Lookbook**: Interactive lifestyle images with product hotspots and quick-add functionality.
