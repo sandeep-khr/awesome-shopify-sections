@@ -7,3 +7,4 @@ A collection of modern, reusable Shopify sections and Liquid snippets designed t
 - **Infinite Marquee**: Smooth scrolling announcement bar.
 - **Pro Bundle Builder**: Complex "Build Your Own Bundle" system (Client-side).
 - **Shoppable Lookbook**: Interactive lifestyle images with product hotspots and quick-add functionality.
+- **Sticky Buy Bar**: Fixed product bar that appears on scroll with Add-to-Cart button.

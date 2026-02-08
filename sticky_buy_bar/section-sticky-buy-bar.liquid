@@ -1,0 +1,430 @@
+{% schema %}
+{
+  "name": "Sticky Buy Bar",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_text",
+      "label": "Button Text Color",
+      "default": "#1a1a1a"
+    },
+    {
+      "type": "header",
+      "content": "Options"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_price",
+      "label": "Show Price",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_image",
+      "label": "Show Product Image",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "position",
+      "label": "Bar Position",
+      "options": [
+        { "value": "top", "label": "Top" },
+        { "value": "bottom", "label": "Bottom" }
+      ],
+      "default": "bottom"
+    },
+    {
+      "type": "range",
+      "id": "trigger_offset",
+      "min": 100,
+      "max": 1000,
+      "step": 50,
+      "unit": "px",
+      "label": "Show After Scroll (px)",
+      "default": 400,
+      "info": "Bar appears after scrolling this distance"
+    }
+  ],
+  "templates": ["product"],
+  "presets": [
+    {
+      "name": "Sticky Buy Bar"
+    }
+  ]
+}
+{% endschema %}
+
+{% comment %} Only render on product pages {% endcomment %}
+{% if template.name == 'product' %}
+
+<div id="sticky-buy-bar-{{ section.id }}" 
+     class="sticky-buy-bar sticky-buy-bar--{{ section.settings.position }}"
+     data-trigger-offset="{{ section.settings.trigger_offset }}">
+  
+  <div class="sticky-buy-bar__container">
+    {% if section.settings.show_image and product.featured_image %}
+      <div class="sticky-buy-bar__image">
+        {{ product.featured_image | image_url: width: 80 | image_tag: loading: 'lazy' }}
+      </div>
+    {% endif %}
+
+    <div class="sticky-buy-bar__info">
+      <h3 class="sticky-buy-bar__title">{{ product.title | truncate: 40 }}</h3>
+      {% if section.settings.show_price %}
+        <div class="sticky-buy-bar__price">
+          {% if product.compare_at_price > product.price %}
+            <span class="sticky-buy-bar__price--sale">{{ product.price | money }}</span>
+            <span class="sticky-buy-bar__price--compare">{{ product.compare_at_price | money }}</span>
+          {% else %}
+            <span>{{ product.price | money }}</span>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    <div class="sticky-buy-bar__actions">
+      {% if product.variants.size > 1 %}
+        <select class="sticky-buy-bar__variant-select" aria-label="Select variant">
+          {% for variant in product.variants %}
+            <option value="{{ variant.id }}" {% unless variant.available %}disabled{% endunless %}>
+              {{ variant.title }}{% unless variant.available %} - Sold Out{% endunless %}
+            </option>
+          {% endfor %}
+        </select>
+      {% endif %}
+
+      <form method="post" action="/cart/add" class="sticky-buy-bar__form">
+        <input type="hidden" name="id" value="{{ product.selected_or_first_available_variant.id }}" class="sticky-buy-bar__variant-id">
+        <button type="submit" class="sticky-buy-bar__atc" {% unless product.available %}disabled{% endunless %}>
+          {% if product.available %}
+            <span class="sticky-buy-bar__atc-text">Add to Cart</span>
+            <span class="sticky-buy-bar__atc-loading" style="display: none;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="12" cy="12" r="10" stroke-opacity="0.25"/>
+                <path d="M12 2a10 10 0 0 1 10 10" stroke-linecap="round">
+                  <animateTransform attributeName="transform" type="rotate" from="0 12 12" to="360 12 12" dur="1s" repeatCount="indefinite"/>
+                </path>
+              </svg>
+            </span>
+            <span class="sticky-buy-bar__atc-success" style="display: none;">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="20 6 9 17 4 12"/>
+              </svg>
+              Added!
+            </span>
+          {% else %}
+            Sold Out
+          {% endif %}
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+  .sticky-buy-bar {
+    position: fixed;
+    left: 0;
+    right: 0;
+    background: {{ section.settings.bg_color }};
+    color: {{ section.settings.text_color }};
+    z-index: 999;
+    transform: translateY(100%);
+    opacity: 0;
+    visibility: hidden;
+    transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+  }
+
+  .sticky-buy-bar--top {
+    top: 0;
+    bottom: auto;
+    transform: translateY(-100%);
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+  }
+
+  .sticky-buy-bar--bottom {
+    bottom: 0;
+    top: auto;
+  }
+
+  .sticky-buy-bar.is-visible {
+    transform: translateY(0);
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .sticky-buy-bar__container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .sticky-buy-bar__image {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    border-radius: 8px;
+    overflow: hidden;
+    background: rgba(255,255,255,0.1);
+  }
+
+  .sticky-buy-bar__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .sticky-buy-bar__info {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .sticky-buy-bar__title {
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0 0 2px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .sticky-buy-bar__price {
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .sticky-buy-bar__price--sale {
+    font-weight: 600;
+    color: #ef4444;
+  }
+
+  .sticky-buy-bar__price--compare {
+    text-decoration: line-through;
+    opacity: 0.6;
+    font-size: 12px;
+  }
+
+  .sticky-buy-bar__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-shrink: 0;
+  }
+
+  .sticky-buy-bar__variant-select {
+    padding: 10px 30px 10px 12px;
+    font-size: 13px;
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 6px;
+    background: transparent;
+    color: inherit;
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='white' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    max-width: 150px;
+  }
+
+  .sticky-buy-bar__variant-select:focus {
+    outline: 2px solid {{ section.settings.button_bg }};
+    outline-offset: 2px;
+  }
+
+  .sticky-buy-bar__form {
+    margin: 0;
+  }
+
+  .sticky-buy-bar__atc {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    padding: 12px 24px;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border: none;
+    border-radius: 6px;
+    background: {{ section.settings.button_bg }};
+    color: {{ section.settings.button_text }};
+    cursor: pointer;
+    transition: all 0.2s ease;
+    min-width: 140px;
+  }
+
+  .sticky-buy-bar__atc:hover:not(:disabled) {
+    opacity: 0.9;
+    transform: translateY(-1px);
+  }
+
+  .sticky-buy-bar__atc:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .sticky-buy-bar__atc.is-loading .sticky-buy-bar__atc-text,
+  .sticky-buy-bar__atc.is-success .sticky-buy-bar__atc-text {
+    display: none;
+  }
+
+  .sticky-buy-bar__atc.is-loading .sticky-buy-bar__atc-loading {
+    display: inline-flex !important;
+  }
+
+  .sticky-buy-bar__atc.is-success .sticky-buy-bar__atc-success {
+    display: inline-flex !important;
+    align-items: center;
+    gap: 6px;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .sticky-buy-bar__container {
+      padding: 10px 15px;
+      gap: 12px;
+    }
+
+    .sticky-buy-bar__image {
+      width: 40px;
+      height: 40px;
+    }
+
+    .sticky-buy-bar__title {
+      font-size: 13px;
+    }
+
+    .sticky-buy-bar__price {
+      font-size: 12px;
+    }
+
+    .sticky-buy-bar__variant-select {
+      display: none;
+    }
+
+    .sticky-buy-bar__atc {
+      padding: 10px 16px;
+      font-size: 12px;
+      min-width: 100px;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .sticky-buy-bar__image {
+      display: none;
+    }
+  }
+</style>
+
+<script>
+  (function() {
+    const bar = document.getElementById('sticky-buy-bar-{{ section.id }}');
+    if (!bar) return;
+
+    const triggerOffset = parseInt(bar.dataset.triggerOffset) || 400;
+    const form = bar.querySelector('.sticky-buy-bar__form');
+    const variantSelect = bar.querySelector('.sticky-buy-bar__variant-select');
+    const variantInput = bar.querySelector('.sticky-buy-bar__variant-id');
+    const atcButton = bar.querySelector('.sticky-buy-bar__atc');
+
+    // Show/hide on scroll
+    let lastScrollY = window.scrollY;
+    let ticking = false;
+
+    function updateBarVisibility() {
+      if (window.scrollY > triggerOffset) {
+        bar.classList.add('is-visible');
+      } else {
+        bar.classList.remove('is-visible');
+      }
+      ticking = false;
+    }
+
+    window.addEventListener('scroll', function() {
+      if (!ticking) {
+        window.requestAnimationFrame(updateBarVisibility);
+        ticking = true;
+      }
+    }, { passive: true });
+
+    // Initial check
+    updateBarVisibility();
+
+    // Variant selection
+    if (variantSelect && variantInput) {
+      variantSelect.addEventListener('change', function() {
+        variantInput.value = this.value;
+      });
+    }
+
+    // AJAX Add to Cart
+    if (form) {
+      form.addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        if (atcButton.classList.contains('is-loading')) return;
+
+        atcButton.classList.add('is-loading');
+        atcButton.classList.remove('is-success');
+
+        const formData = new FormData(form);
+
+        fetch(window.Shopify.routes.root + 'cart/add.js', {
+          method: 'POST',
+          body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+          atcButton.classList.remove('is-loading');
+          atcButton.classList.add('is-success');
+
+          // Dispatch cart update event for themes that listen
+          document.dispatchEvent(new CustomEvent('cart:refresh'));
+
+          setTimeout(() => {
+            atcButton.classList.remove('is-success');
+          }, 2500);
+        })
+        .catch(error => {
+          console.error('Error adding to cart:', error);
+          atcButton.classList.remove('is-loading');
+          alert('Could not add to cart. Please try again.');
+        });
+      });
+    }
+  })();
+</script>
+
+{% endif %}
