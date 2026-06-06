@@ -1,0 +1,95 @@
+<section
+  class="theme-blocks-wrapper theme-blocks-wrapper--{{ section.id }}"
+  style="
+    --theme-blocks-wrapper-max-width: {{ section.settings.max_width }}px;
+    --theme-blocks-wrapper-padding-top: {{ section.settings.padding_top }}px;
+    --theme-blocks-wrapper-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --theme-blocks-wrapper-gap: {{ section.settings.block_gap }}px;
+  "
+>
+  <div class="theme-blocks-wrapper__inner">
+    {% content_for 'blocks' %}
+  </div>
+</section>
+
+<style>
+  .theme-blocks-wrapper--{{ section.id }} {
+    padding-top: var(--theme-blocks-wrapper-padding-top);
+    padding-bottom: var(--theme-blocks-wrapper-padding-bottom);
+  }
+
+  .theme-blocks-wrapper--{{ section.id }} .theme-blocks-wrapper__inner {
+    max-width: var(--theme-blocks-wrapper-max-width);
+    margin: 0 auto;
+    padding: 0 20px;
+    display: grid;
+    gap: var(--theme-blocks-wrapper-gap);
+  }
+
+  @media screen and (max-width: 749px) {
+    .theme-blocks-wrapper--{{ section.id }} .theme-blocks-wrapper__inner {
+      padding: 0 16px;
+    }
+  }
+</style>
+
+{% schema %}
+{
+  "name": "Theme blocks wrapper",
+  "blocks": [
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 480,
+      "max": 1440,
+      "step": 20,
+      "unit": "px",
+      "label": "Content width",
+      "default": 1100
+    },
+    {
+      "type": "range",
+      "id": "block_gap",
+      "min": 0,
+      "max": 48,
+      "step": 4,
+      "unit": "px",
+      "label": "Gap between blocks",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Theme blocks wrapper"
+    }
+  ]
+}
+{% endschema %}
