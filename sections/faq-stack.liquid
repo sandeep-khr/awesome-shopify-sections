@@ -1,0 +1,439 @@
+<section
+  class="faq-stack faq-stack--{{ section.id }}"
+  data-single-open="{{ section.settings.single_open }}"
+  style="
+    --faq-stack-max-width: {{ section.settings.max_width }}px;
+    --faq-stack-padding-top: {{ section.settings.padding_top }}px;
+    --faq-stack-padding-bottom: {{ section.settings.padding_bottom }}px;
+    --faq-stack-gap: {{ section.settings.item_gap }}px;
+    --faq-stack-background: {{ section.settings.background_color }};
+    --faq-stack-surface: {{ section.settings.surface_color }};
+    --faq-stack-surface-hover: {{ section.settings.surface_hover_color }};
+    --faq-stack-text: {{ section.settings.text_color }};
+    --faq-stack-muted: {{ section.settings.muted_text_color }};
+    --faq-stack-accent: {{ section.settings.accent_color }};
+    --faq-stack-border: {{ section.settings.border_color }};
+  "
+>
+  <div class="faq-stack__shell">
+    {% if section.settings.eyebrow != blank or section.settings.heading != blank or section.settings.intro != blank %}
+      <div class="faq-stack__header">
+        {% if section.settings.eyebrow != blank %}
+          <p class="faq-stack__eyebrow">{{ section.settings.eyebrow }}</p>
+        {% endif %}
+
+        {% if section.settings.heading != blank %}
+          <h2 class="faq-stack__heading">{{ section.settings.heading }}</h2>
+        {% endif %}
+
+        {% if section.settings.intro != blank %}
+          <div class="faq-stack__intro rte">{{ section.settings.intro }}</div>
+        {% endif %}
+      </div>
+    {% endif %}
+
+    <div class="faq-stack__items" role="list">
+      {% if section.blocks.size > 0 %}
+        {% content_for 'blocks' %}
+      {% else %}
+        <div class="faq-stack__empty">
+          <p>Add FAQ item blocks to build out this stack.</p>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</section>
+
+<style>
+  .faq-stack--{{ section.id }} {
+    background: var(--faq-stack-background);
+    color: var(--faq-stack-text);
+    padding-top: var(--faq-stack-padding-top);
+    padding-bottom: var(--faq-stack-padding-bottom);
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__shell {
+    max-width: var(--faq-stack-max-width);
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__header {
+    max-width: 760px;
+    margin: 0 auto 32px;
+    text-align: center;
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__eyebrow {
+    margin: 0 0 12px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--faq-stack-accent);
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__heading {
+    margin: 0;
+    font-size: clamp(2rem, 4vw, 3.4rem);
+    line-height: 1.02;
+    letter-spacing: -0.04em;
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__intro {
+    margin-top: 16px;
+    color: var(--faq-stack-muted);
+    font-size: 1rem;
+    line-height: 1.7;
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__intro p {
+    margin: 0;
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__items {
+    display: grid;
+    gap: var(--faq-stack-gap);
+  }
+
+  .faq-stack--{{ section.id }} .faq-stack__empty {
+    border: 1px dashed var(--faq-stack-border);
+    border-radius: 24px;
+    padding: 28px;
+    text-align: center;
+    color: var(--faq-stack-muted);
+    background: var(--faq-stack-surface);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item {
+    border: 1px solid var(--faq-stack-border);
+    border-radius: 24px;
+    background: var(--faq-stack-surface);
+    overflow: hidden;
+    transition: border-color 0.2s ease, transform 0.2s ease, background 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item:hover {
+    background: var(--faq-stack-surface-hover);
+    border-color: var(--faq-stack-accent);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, 0.08);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item[open] {
+    background: var(--faq-stack-surface-hover);
+    border-color: var(--faq-stack-accent);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item--borderless {
+    border-width: 0;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    cursor: pointer;
+    padding: 24px 26px;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__summary:focus-visible {
+    outline: 2px solid var(--faq-stack-accent);
+    outline-offset: -2px;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__question {
+    font-size: var(--faq-question-size, 1.05rem);
+    font-weight: 650;
+    line-height: 1.35;
+    letter-spacing: -0.02em;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__icon {
+    position: relative;
+    flex-shrink: 0;
+    width: 20px;
+    height: 20px;
+    color: var(--faq-stack-accent);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__icon-line {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 18px;
+    height: 2px;
+    border-radius: 999px;
+    background: currentColor;
+    transform: translate(-50%, -50%);
+    transition: transform 0.2s ease, opacity 0.2s ease;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__icon-line--vertical {
+    width: 2px;
+    height: 18px;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item[open] .theme-faq-item__icon-line--vertical {
+    opacity: 0;
+    transform: translate(-50%, -50%) scaleY(0.2);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item--icon-chevron .theme-faq-item__icon-line--horizontal {
+    width: 12px;
+    transform: translate(-75%, -50%) rotate(45deg);
+    transform-origin: center;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item--icon-chevron .theme-faq-item__icon-line--vertical {
+    width: 12px;
+    height: 2px;
+    transform: translate(-25%, -50%) rotate(-45deg);
+    transform-origin: center;
+    opacity: 1;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item--icon-chevron[open] .theme-faq-item__icon-line--horizontal {
+    transform: translate(-75%, -50%) rotate(-45deg);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item--icon-chevron[open] .theme-faq-item__icon-line--vertical {
+    transform: translate(-25%, -50%) rotate(45deg);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__panel {
+    padding: 0 26px 24px;
+    color: var(--faq-stack-muted);
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__answer {
+    max-width: 70ch;
+    line-height: 1.7;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__answer > *:first-child {
+    margin-top: 0;
+  }
+
+  .faq-stack--{{ section.id }} .theme-faq-item__answer > *:last-child {
+    margin-bottom: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .faq-stack--{{ section.id }} .faq-stack__shell {
+      padding: 0 16px;
+    }
+
+    .faq-stack--{{ section.id }} .faq-stack__header {
+      margin-bottom: 24px;
+      text-align: left;
+    }
+
+    .faq-stack--{{ section.id }} .theme-faq-item__summary {
+      padding: 20px;
+      gap: 14px;
+    }
+
+    .faq-stack--{{ section.id }} .theme-faq-item__panel {
+      padding: 0 20px 20px;
+    }
+  }
+</style>
+
+<script>
+  (() => {
+    const root = document.querySelector('.faq-stack--{{ section.id }}');
+
+    if (!root || root.dataset.initialized === 'true') {
+      return;
+    }
+
+    root.dataset.initialized = 'true';
+
+    if (root.dataset.singleOpen !== 'true') {
+      return;
+    }
+
+    root.addEventListener(
+      'toggle',
+      (event) => {
+        const openedItem = event.target;
+
+        if (!(openedItem instanceof HTMLDetailsElement) || !openedItem.open) {
+          return;
+        }
+
+        root.querySelectorAll('.theme-faq-item[open]').forEach((item) => {
+          if (item !== openedItem) {
+            item.open = false;
+          }
+        });
+      },
+      true
+    );
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "FAQ stack",
+  "blocks": [
+    {
+      "type": "faq-item"
+    },
+    {
+      "type": "@theme"
+    },
+    {
+      "type": "@app"
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "eyebrow",
+      "label": "Eyebrow",
+      "default": "Customer questions"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Answers that remove buying friction"
+    },
+    {
+      "type": "richtext",
+      "id": "intro",
+      "label": "Intro",
+      "default": "<p>Use reusable FAQ blocks here, or swap in other theme blocks later as this starter kit grows.</p>"
+    },
+    {
+      "type": "range",
+      "id": "max_width",
+      "min": 640,
+      "max": 1200,
+      "step": 20,
+      "unit": "px",
+      "label": "Content width",
+      "default": 900
+    },
+    {
+      "type": "range",
+      "id": "item_gap",
+      "min": 0,
+      "max": 24,
+      "step": 2,
+      "unit": "px",
+      "label": "Gap between items",
+      "default": 12
+    },
+    {
+      "type": "checkbox",
+      "id": "single_open",
+      "label": "Keep only one item open",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Top padding",
+      "default": 72
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "label": "Bottom padding",
+      "default": 72
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#f6f1e8"
+    },
+    {
+      "type": "color",
+      "id": "surface_color",
+      "label": "Item background",
+      "default": "#fffdf8"
+    },
+    {
+      "type": "color",
+      "id": "surface_hover_color",
+      "label": "Item hover background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Heading text",
+      "default": "#171717"
+    },
+    {
+      "type": "color",
+      "id": "muted_text_color",
+      "label": "Body text",
+      "default": "#5f5a52"
+    },
+    {
+      "type": "color",
+      "id": "accent_color",
+      "label": "Accent",
+      "default": "#cc5a2f"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#dfd2bf"
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ stack",
+      "blocks": [
+        {
+          "type": "faq-item",
+          "settings": {
+            "question": "Can I use this in Dawn?",
+            "answer": "<p>Yes. The section and block are designed to drop into modern Online Store 2.0 themes, with Dawn as the main baseline.</p>",
+            "default_open": true
+          }
+        },
+        {
+          "type": "faq-item",
+          "settings": {
+            "question": "Why build this as a theme block?",
+            "answer": "<p>Theme blocks are reusable across sections, work well with Shopify's newer architecture, and make your theme more flexible for merchants.</p>"
+          }
+        },
+        {
+          "type": "faq-item",
+          "settings": {
+            "question": "Does it need extra JavaScript?",
+            "answer": "<p>No large dependency is required. It works with semantic details and summary markup, plus a small enhancement when you want single-open accordion behavior.</p>"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,129 @@
+{% liquid
+  assign question_text = block.settings.question | strip_html | strip
+  assign answer_text = block.settings.answer
+
+  case block.settings.heading_size
+    when 'small'
+      assign question_size = '0.95rem'
+    when 'large'
+      assign question_size = '1.2rem'
+    else
+      assign question_size = '1.05rem'
+  endcase
+%}
+
+<details
+  class="theme-faq-item{% unless block.settings.show_divider %} theme-faq-item--borderless{% endunless %} theme-faq-item--icon-{{ block.settings.icon_style | default: 'plus' }}"
+  style="--faq-question-size: {{ question_size }};"
+  {% if block.settings.default_open %}
+    open
+  {% endif %}
+  {{ block.shopify_attributes }}
+>
+  <summary
+    class="theme-faq-item__summary"
+    id="FaqSummary-{{ block.id }}"
+    aria-controls="FaqPanel-{{ block.id }}"
+  >
+    <span class="theme-faq-item__question">
+      {% if question_text != blank %}
+        {{ block.settings.question }}
+      {% else %}
+        Frequently asked question
+      {% endif %}
+    </span>
+
+    <span class="theme-faq-item__icon" aria-hidden="true">
+      <span class="theme-faq-item__icon-line theme-faq-item__icon-line--horizontal"></span>
+      <span class="theme-faq-item__icon-line theme-faq-item__icon-line--vertical"></span>
+    </span>
+  </summary>
+
+  <div
+    class="theme-faq-item__panel"
+    id="FaqPanel-{{ block.id }}"
+    role="region"
+    aria-labelledby="FaqSummary-{{ block.id }}"
+  >
+    <div class="theme-faq-item__answer rte">
+      {% if answer_text != blank %}
+        {{ answer_text }}
+      {% else %}
+        <p>Share a helpful answer here so shoppers can move forward with confidence.</p>
+      {% endif %}
+    </div>
+  </div>
+</details>
+
+{% schema %}
+{
+  "name": "FAQ item",
+  "settings": [
+    {
+      "type": "inline_richtext",
+      "id": "question",
+      "label": "Question",
+      "default": "What makes this section useful?"
+    },
+    {
+      "type": "richtext",
+      "id": "answer",
+      "label": "Answer",
+      "default": "<p>It gives merchants an accessible FAQ pattern while showing developers how reusable theme blocks fit together.</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "default_open",
+      "label": "Open by default",
+      "default": false
+    },
+    {
+      "type": "select",
+      "id": "icon_style",
+      "label": "Icon style",
+      "options": [
+        {
+          "value": "plus",
+          "label": "Plus"
+        },
+        {
+          "value": "chevron",
+          "label": "Chevron"
+        }
+      ],
+      "default": "plus"
+    },
+    {
+      "type": "select",
+      "id": "heading_size",
+      "label": "Question size",
+      "options": [
+        {
+          "value": "small",
+          "label": "Small"
+        },
+        {
+          "value": "medium",
+          "label": "Medium"
+        },
+        {
+          "value": "large",
+          "label": "Large"
+        }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_divider",
+      "label": "Show divider",
+      "default": true
+    }
+  ],
+  "presets": [
+    {
+      "name": "FAQ item"
+    }
+  ]
+}
+{% endschema %}
